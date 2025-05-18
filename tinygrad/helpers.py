@@ -78,7 +78,10 @@ def pluralize(st:str, cnt:int): return f"{cnt} {st}"+('' if cnt == 1 else 's')
 # for length N coefficients `p`, returns p[0] * x**(N-1) + p[1] * x**(N-2) + ... + p[-2] * x + p[-1]
 def polyN(x:T, p:list[float]) -> T: return functools.reduce(lambda acc,c: acc*x+c, p, 0.0)  # type: ignore
 
-def rotr32(x:int, n:int) -> int: return ((x >> n) | (x << (32 - n))) & 0xFFFFFFFF
+def rotr32(x:int, n:int) -> int:
+  """32-bit right rotation function used in cryptographic algorithms like BLAKE3.
+  Performs circular right shift and handles 32-bit overflow correctly."""
+  return ((x >> n) | (x << (32 - n))) & 0xFFFFFFFF
 
 def g_blake3(state:list[int], a:int, b:int, c:int, d:int, x:int, y:int) -> None:
   """BLAKE3 G function - core mixing function for the BLAKE3 hash.
