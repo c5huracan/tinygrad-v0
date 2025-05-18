@@ -78,6 +78,20 @@ def pluralize(st:str, cnt:int): return f"{cnt} {st}"+('' if cnt == 1 else 's')
 # for length N coefficients `p`, returns p[0] * x**(N-1) + p[1] * x**(N-2) + ... + p[-2] * x + p[-1]
 def polyN(x:T, p:list[float]) -> T: return functools.reduce(lambda acc,c: acc*x+c, p, 0.0)  # type: ignore
 
+def rotr32(x:int, n:int) -> int: return ((x >> n) | (x << (32 - n))) & 0xFFFFFFFF
+
+def g_blake3(state:list[int], a:int, b:int, c:int, d:int, x:int, y:int) -> None:
+  """BLAKE3 G function - core mixing function for the BLAKE3 hash.
+  Modifies the state list in-place by mixing input words x and y into state indices a, b, c, d."""
+  state[a] = (state[a] + state[b] + x) & 0xFFFFFFFF
+  state[d] = rotr32(state[d] ^ state[a], 16)
+  state[c] = (state[c] + state[d]) & 0xFFFFFFFF
+  state[b] = rotr32(state[b] ^ state[c], 12)
+  state[a] = (state[a] + state[b] + y) & 0xFFFFFFFF
+  state[d] = rotr32(state[d] ^ state[a], 8)
+  state[c] = (state[c] + state[d]) & 0xFFFFFFFF
+  state[b] = rotr32(state[b] ^ state[c], 7)
+
 @functools.cache
 def to_function_name(s:str): return ''.join([c if c in (string.ascii_letters+string.digits+'_') else f'{ord(c):02X}' for c in ansistrip(s)])
 @functools.cache
